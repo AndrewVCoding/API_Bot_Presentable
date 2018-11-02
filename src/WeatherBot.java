@@ -1,6 +1,6 @@
-import java.io.IOException;
-
 import org.jibble.pircbot.PircBot;
+
+import java.io.IOException;
 
 /**
  * The bot class itself
@@ -15,7 +15,7 @@ public class WeatherBot extends PircBot
 	private APIclass	DATA;
 	private String		CHANNEL;
 
-	public WeatherBot(String name)
+	WeatherBot(String name)
 	{
 		// Set the name of the chatbot to Weatherbot
 		NAME = name;
@@ -30,11 +30,12 @@ public class WeatherBot extends PircBot
 	 * Receives messages from the IRC channel and if they start with WEATHERBOT, then it parses it
 	 * as a command and responds accordingly by sending a message
 	 */
+	// @todo Move towards using regex to extract the information
 	public void onMessage(String channel, String sender, String login, String hostname, String message)
 	{
 		// Split the message up into individual words
 		String[] content = message.split(" ");
-		String command = "";
+		String command;
 
 		// If message is a command directed at weatherbot, parse the information in the command to
 		// determine the query
@@ -80,9 +81,9 @@ public class WeatherBot extends PircBot
 	/**
 	 * Display the commands the bot can respond to
 	 * 
-	 * @param channel
+	 * @param channel the channel to send messages to
 	 */
-	public void help(String channel)
+    private void help(String channel)
 	{
 		sendMessage(channel, "Commands: <I/M> specifies Imperial or Metric units");
 		sendMessage(channel, "          " + NAME.toUpperCase() + " <I/M> <zipcode>             : Gives a general description of the weather");
@@ -94,12 +95,12 @@ public class WeatherBot extends PircBot
 	/**
 	 * Displays the weather
 	 * 
-	 * @param channel
-	 * @param content
-	 * @param sender
+	 * @param channel The channel to send messages to
+	 * @param content The content of the message
+	 * @param sender The name of the user who sent the command
 	 * @throws IOException
 	 */
-	public void giveWeather(String channel, String[] content, String sender) throws IOException
+    private void giveWeather(String channel, String[] content, String sender) throws IOException
 	{
 		DATA.fetchWeather(content[2]);
 		String description = DATA.getWeather(content[1]);
@@ -109,18 +110,18 @@ public class WeatherBot extends PircBot
 	/**
 	 * Displays the temperature
 	 * 
-	 * @param content
-	 * @param channel
-	 * @param sender
+	 * @param content The content of the message
+	 * @param channel The channel to send messages to
+	 * @param sender The name of the user who sent the command
 	 * @throws IOException
 	 */
-	public void giveTemperature(String[] content, String channel, String sender) throws IOException
+    private void giveTemperature(String[] content, String channel, String sender) throws IOException
 	{
 		DATA.fetchWeather(content[3]);
 		sendMessage(channel, sender + ": The current temperature is " + DATA.getTemp(content[2]));
 	}
 
-	public void giveISS(String channel, String sender) throws IOException
+	private void giveISS(String channel, String sender) throws IOException
 	{
 		DATA.fetchISS();
 		sendMessage(channel, sender + ": The current position of the ISS is " + DATA.getPos());
@@ -129,9 +130,9 @@ public class WeatherBot extends PircBot
 	/**
 	 * Message to send when joining the channel to let users know about the bot
 	 * 
-	 * @param channel
+	 * @param channel The name of the channel to send messages to
 	 */
-	public void welcome(String channel)
+    void welcome(String channel)
 	{
 		CHANNEL = channel;
 		sendMessage(channel, "Hi, I'm " + NAME + "! To see how to give me commands, type \"" + NAME + " help\"");

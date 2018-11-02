@@ -1,7 +1,7 @@
-import java.io.IOException;
-
 import org.jibble.pircbot.IrcException;
 import org.jibble.pircbot.NickAlreadyInUseException;
+
+import java.io.IOException;
 
 /**
  * The driver class for the WeatherBot
@@ -32,11 +32,7 @@ public class BotDriver
 		{
 			System.out.println("Nickname already in use");
 		}
-		catch (IOException e)
-		{
-			System.out.println("Could not connect");
-		}
-		catch (IrcException e)
+		catch (IOException | IrcException e)
 		{
 			System.out.println("Could not connect");
 		}
