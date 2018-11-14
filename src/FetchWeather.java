@@ -34,7 +34,6 @@ class FetchWeather {
             temp = WEATHER_DATA.main.temp - 273.15;
         }
 
-        System.out.println(temp);
         return String.format("%.2f " + degrees, temp);
     }
 
@@ -48,28 +47,12 @@ class FetchWeather {
      * @return A short description of the weather
      */
     String getWeather(String units) {
-        String degrees = "";
-        String temp = "";
         String date = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new java.util.Date(WEATHER_DATA.dt * 1000));
 
-        // Convert to Imperial units
-        if (units.equalsIgnoreCase("I")) {
-            // Convert all temperature values
-            degrees = "degrees farenheit";
-            temp = String.format("%.2f", (((WEATHER_DATA.main.temp * 9) / 5) - 459.67));
-        }
-
-        // Convert to Metric
-        if (units.equalsIgnoreCase("M")) {
-            // Convert all temperature values
-            degrees = "degrees celsius";
-            temp = String.format("%.2f", WEATHER_DATA.main.temp - 273.15);
-
-            // Wind speed is metric by default
-        }
-
         // Put all the information together
-        return "Current weather for " + WEATHER_DATA.name + " on " + date + ": " + WEATHER_DATA.weather[0].description + " and " + temp + " " + degrees
+        String description = "Current weather for " + WEATHER_DATA.name + " on " + date + ": " + WEATHER_DATA.weather[0].description + " and " + getTemp(units)
                 + ", with a humidity of " + WEATHER_DATA.main.humidity + "%";
+
+        return description;
     }
 }

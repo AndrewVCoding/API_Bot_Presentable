@@ -15,6 +15,11 @@ public class WeatherBot extends PircBot
 	private APIclass	DATA;
 	private String		CHANNEL;
 
+    /**
+     * Initialize the weather bot
+     *
+     * @param name The name of the weatherbot will also be the command trigger
+     */
 	WeatherBot(String name)
 	{
 		// Set the name of the chatbot to Weatherbot
@@ -26,46 +31,47 @@ public class WeatherBot extends PircBot
 		DATA = new APIclass();
 	}
 
-	/**
-	 * Receives messages from the IRC channel and if they start with WEATHERBOT, then it parses it
-	 * as a command and responds accordingly by sending a message
-	 */
-	// @todo Move towards using regex to extract the information
+    /**
+     * Receives messages from the IRC channel and if they start with WEATHERBOT, then it parses it
+     * 	 as a command and responds accordingly by sending a message
+     *
+     * @param channel The channel to send the message to
+     * @param sender The user sending the command
+     * @param login login
+     * @param hostname hostname
+     * @param message Message being received
+     */
 	public void onMessage(String channel, String sender, String login, String hostname, String message)
 	{
-		// Split the message up into individual words
-		String[] content = message.split(" ");
-		String command;
+		Command command;
 
 		// If message is a command directed at weatherbot, parse the information in the command to
 		// determine the query
 		if (COMMANDS.isCommand(message))
 		{
-			command = COMMANDS.parseCommand(message);
-
-			System.out.println("COMMAND: " + command);
+			command = COMMANDS.parseCommand(sender, message.replaceAll("(?i)" + COMMANDS.getTRIGGER(), ""));
 
 			// UNKNOWN COMMAND
 			if (command.equalsIgnoreCase("unknown"))
 			{
 				sendMessage(CHANNEL, sender + ": Sorry, but I didn't recognise that command.");
 			}
+
+			else if (command.equalsIgnoreCase("help"))
+                help(channel);
+
 			else
 			{
 				// Retrieve data from the api
 				try
 				{
-					// HELP
-					if (command.equalsIgnoreCase("help"))
-						help(channel);
-
 					// WEATHER
 					if (command.equalsIgnoreCase("weather"))
-						giveWeather(channel, content, sender);
+						giveWeather(channel, command.user, command.zipcode, command.units);
 
 					// TEMPERATURE
 					if (command.equalsIgnoreCase("temperature"))
-						giveTemperature(content, channel, sender);
+						giveTemperature(channel, sender, command.zipcode, command.units);
 					// ISS
 					if (command.equalsIgnoreCase("iss"))
 						giveISS(channel, sender);
@@ -73,6 +79,7 @@ public class WeatherBot extends PircBot
 				catch (IOException e)
 				{
 					sendMessage(CHANNEL, sender + ": Sorry, but the weather is currently unavailable.");
+					e.printStackTrace();
 				}
 			}
 		}
@@ -96,31 +103,39 @@ public class WeatherBot extends PircBot
 	 * Displays the weather
 	 * 
 	 * @param channel The channel to send messages to
-	 * @param content The content of the message
 	 * @param sender The name of the user who sent the command
+     * @param zipcode The zipcode location
+     * @param units The units to use
 	 * @throws IOException
 	 */
-    private void giveWeather(String channel, String[] content, String sender) throws IOException
+    private void giveWeather(String channel, String sender, String zipcode, String units) throws IOException
 	{
-		DATA.fetchWeather(content[2]);
-		String description = DATA.getWeather(content[1]);
+		DATA.fetchWeather(zipcode);
+		String description = DATA.getWeather(units);
 		sendMessage(channel, sender + ": " + description);
 	}
 
 	/**
 	 * Displays the temperature
-	 * 
-	 * @param content The content of the message
+	 *
 	 * @param channel The channel to send messages to
 	 * @param sender The name of the user who sent the command
+     * @param zipcode The zipcode location
+     * @param units The units to use
 	 * @throws IOException
 	 */
-    private void giveTemperature(String[] content, String channel, String sender) throws IOException
+    private void giveTemperature(String channel, String sender, String zipcode, String units) throws IOException
 	{
-		DATA.fetchWeather(content[3]);
-		sendMessage(channel, sender + ": The current temperature is " + DATA.getTemp(content[2]));
+		DATA.fetchWeather(zipcode);
+		sendMessage(channel, sender + ": The current temperature is " + DATA.getTemp(units));
 	}
 
+    /**
+     * Send a message to the channel with the coordinates of the ISS
+     * @param channel The channel to send the message to
+     * @param sender The User requesting the information
+     * @throws IOException
+     */
 	private void giveISS(String channel, String sender) throws IOException
 	{
 		DATA.fetchISS();

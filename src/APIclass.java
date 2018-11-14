@@ -24,7 +24,6 @@ class APIclass {
 
         // get the url for the weather data object
         String address = "http://api.openweathermap.org/data/2.5/weather?zip=" + zipcode + ",us&appid=" + APP_ID;
-        System.out.println(address);
         URL url = new URL(address);
 
         // create an input stream from the url
