@@ -14,7 +14,7 @@ public class BotDriver
 	public static void main(String[] args)
 	{
 		// Instantiate the bot
-		WeatherBot weatherBot = new WeatherBot("WeatherBot");
+		WeatherBot weatherBot = new WeatherBot("WeatherBotAndrew");
 
 		// set debugging output
 		weatherBot.setVerbose(true);
